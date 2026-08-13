@@ -21,6 +21,57 @@ AbiCut provides a structured workflow for this process:
 5. Confirm the configuration before the event.
 6. Start Live Mode and let AbiCut react to PowerPoint slide changes.
 
+## Application Workflow
+
+### 1. Create a Project
+
+AbiCut starts with a project wizard. A project name, Excel class list and optionally a Spotify playlist can be provided during setup.
+
+![AbiCut Project Wizard](docs/screenshots/new_project.png)
+
+### 2. Import Students
+
+Student names are imported from the selected Excel file. AbiCut detects the relevant name columns and creates the slide structure automatically.
+
+![AbiCut Student Import](docs/screenshots/student_import.png)
+
+### 3. Import a Spotify Playlist
+
+A Spotify playlist can be imported and matched to the generated student slides.
+
+![AbiCut Playlist Import](docs/screenshots/playlist_import.png)
+
+### 4. Manage Projects
+
+The main screen and project manager provide an overview of preparation progress and allow existing projects to be opened, duplicated, renamed or deleted.
+
+![AbiCut Startscreen](docs/screenshots/startscreen.png)
+
+![AbiCut Project Manager](docs/screenshots/project_manager.png)
+
+### 5. Configure Music Segments
+
+The editor shows all slides and their preparation state. For each slide, the song, playback position, duration and fade values can be configured and verified.
+
+![AbiCut Editor](docs/screenshots/editor_overview.png)
+
+![AbiCut Slide Editor](docs/screenshots/slide_editor.png)
+
+### 6. Configure Defaults
+
+Default values for start position, song duration and fades can be configured globally.
+
+![AbiCut Settings](docs/screenshots/settings_defaults.png)
+
+### 7. Run the Event
+
+During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the current playback state.
+
+| Unconfigured | Playing | Disabled |
+|---|---|---|
+| ![](docs/screenshots/live_unconfigured.png) | ![](docs/screenshots/live_playing.png) | ![](docs/screenshots/live_disabled.png) |
+
+
 ## Features
 
 - **Project Wizard**
@@ -276,56 +327,6 @@ The public repository is intended to document the technical implementation while
 AbiCut grew from the practical requirement to coordinate PowerPoint slides and individual music segments reliably during a graduation event.
 
 What started as a smaller event-control tool developed into a modular desktop application with project management, Excel and Spotify imports, editing and validation tools, persistent JSON project data and a dedicated Live Controller.
-
-## Application Workflow
-
-### 1. Create a Project
-
-AbiCut starts with a project wizard. A project name, Excel class list and optionally a Spotify playlist can be provided during setup.
-
-![AbiCut Project Wizard](docs/screenshots/new_project.png)
-
-### 2. Import Students
-
-Student names are imported from the selected Excel file. AbiCut detects the relevant name columns and creates the slide structure automatically.
-
-![AbiCut Student Import](docs/screenshots/student_import.png)
-
-### 3. Import a Spotify Playlist
-
-A Spotify playlist can be imported and matched to the generated student slides.
-
-![AbiCut Playlist Import](docs/screenshots/playlist_import.png)
-
-### 4. Manage Projects
-
-The main screen and project manager provide an overview of preparation progress and allow existing projects to be opened, duplicated, renamed or deleted.
-
-![AbiCut Startscreen](docs/screenshots/startscreen.png)
-
-![AbiCut Project Manager](docs/screenshots/project_manager.png)
-
-### 5. Configure Music Segments
-
-The editor shows all slides and their preparation state. For each slide, the song, playback position, duration and fade values can be configured and verified.
-
-![AbiCut Editor](docs/screenshots/editor_overview.png)
-
-![AbiCut Slide Editor](docs/screenshots/slide_editor.png)
-
-### 6. Configure Defaults
-
-Default values for start position, song duration and fades can be configured globally.
-
-![AbiCut Settings](docs/screenshots/settings_defaults.png)
-
-### 7. Run the Event
-
-During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the current playback state.
-
-| Unconfigured | Playing | Disabled |
-|---|---|---|
-| ![](docs/screenshots/live_unconfigured.png) | ![](docs/screenshots/live_playing.png) | ![](docs/screenshots/live_disabled.png) |
 
 ## Author
 
