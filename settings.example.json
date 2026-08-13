@@ -1,0 +1,13 @@
+{
+    "spotify": {
+        "client_id": "YOUR_SPOTIFY_CLIENT_ID",
+        "client_secret": "YOUR_SPOTIFY_CLIENT_SECRET",
+        "redirect_uri": "http://127.0.0.1:8888/callback"
+    },
+    "defaults": {
+        "song_duration": 30000,
+        "fade_in": 2,
+        "fade_out": 2,
+        "start_ms": 0
+    }
+}

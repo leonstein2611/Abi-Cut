@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Spotify / local configuration
+settings.json
+config.json
+.cache
+.spotify_cache*
+
+# Local AbiCut project data
+current_project.txt
+projects/
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Windows / macOS
+Thumbs.db
+.DS_Store

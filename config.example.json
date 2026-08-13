@@ -1,0 +1,58 @@
+{
+    "project": {
+        "name": "Example Project",
+        "created": "01.01.2026",
+        "version": "1.0.0"
+    },
+    "statistics": {
+        "total_slides": 3,
+        "songs_added": 2,
+        "time_confirmed": 1,
+        "disabled": 1,
+        "finished": 1
+    },
+    "slides": {
+        "2": {
+            "student": "Max Mustermann",
+            "student_id": "example-student-001",
+            "song": "Example Song",
+            "artist": "Example Artist",
+            "uri": "spotify:track:EXAMPLE_TRACK_ID",
+            "start_ms": 15000,
+            "duration_ms": 30000,
+            "fade_in": 2.0,
+            "fade_out": 2.0,
+            "enabled": true,
+            "song_added": true,
+            "time_confirmed": true
+        },
+        "3": {
+            "student": "Erika Musterfrau",
+            "student_id": "example-student-002",
+            "song": "Another Example Song",
+            "artist": "Example Artist",
+            "uri": "spotify:track:ANOTHER_EXAMPLE_TRACK_ID",
+            "start_ms": 0,
+            "duration_ms": 30000,
+            "fade_in": 2.0,
+            "fade_out": 2.0,
+            "enabled": false,
+            "song_added": true,
+            "time_confirmed": false
+        },
+        "4": {
+            "student": "Alex Beispiel",
+            "student_id": "example-student-003",
+            "song": "",
+            "artist": "",
+            "uri": "",
+            "start_ms": 0,
+            "duration_ms": 30000,
+            "fade_in": 2.0,
+            "fade_out": 2.0,
+            "enabled": true,
+            "song_added": false,
+            "time_confirmed": false
+        }
+    }
+}

@@ -1,0 +1,5 @@
+spotipy
+pandas
+pywin32
+openpyxl
+xlrd
