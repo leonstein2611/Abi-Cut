@@ -328,6 +328,10 @@ AbiCut grew from the practical requirement to coordinate PowerPoint slides and i
 
 What started as a smaller event-control tool developed into a modular desktop application with project management, Excel and Spotify imports, editing and validation tools, persistent JSON project data and a dedicated Live Controller.
 
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 ## Author
 
 **Leon Stein**
