@@ -330,7 +330,7 @@ What started as a smaller event-control tool developed into a modular desktop ap
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE.md](LICENSE) for details.
+This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 
 ## Author
 
