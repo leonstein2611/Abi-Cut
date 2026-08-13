@@ -161,9 +161,11 @@ pip install -r requirements.txt
 
 ## Spotify Configuration
 
-Real credentials are intentionally **not** stored in this repository.
+Real Spotify credentials are intentionally **not** stored in this repository.
 
-Create your local settings file from the example:
+AbiCut requires valid Spotify API credentials **before the first application start**.
+
+Create a local settings file from the provided example:
 
 ### PowerShell
 
@@ -191,9 +193,12 @@ Then open `settings.json` and enter your own Spotify application credentials:
 
 `settings.json` is excluded through `.gitignore` and should remain local.
 
+Important: Configure client_id and client_secret before running main.py.
+The Spotify connection is initialized during application startup.
+
 ## Running AbiCut
 
-Start the application with:
+After installing the dependencies and configuring your Spotify credentials, start the application with:
 
 ```bash
 python main.py
