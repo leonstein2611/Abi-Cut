@@ -47,7 +47,8 @@ class MusicGUI(BaseWindow):
         self.root = tk.Tk()
         self.root.title("Abi Music Controller")
         self.root.geometry("1550x720")
-       
+
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
         self.config = self.load_config()
 
@@ -1335,18 +1336,29 @@ class MusicGUI(BaseWindow):
         self.slide_tree.selection_set(current)
 
     def back_to_main_menu(self):
+        self.exit_to_menu()
 
+    def on_close(self):
+        self.exit_to_menu()
+
+    def exit_to_menu(self):
         self.result = "menu"
-
         self.cleanup()
-
         self.close("menu")
-
+        
     def cleanup(self):
 
         try:
             if self.spotify_update_job is not None:
                 self.root.after_cancel(self.spotify_update_job)
+                self.spotify_update_job = None
+        except:
+            pass
+
+        try:
+            if self.autosave_job is not None:
+                self.root.after_cancel(self.autosave_job)
+                self.autosave_job = None
         except:
             pass
 
