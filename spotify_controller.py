@@ -9,19 +9,34 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from settings_manager import get_spotify
 
-spotify = get_spotify()
-
 
 class SpotifyController:
 
     def __init__(self):
 
-        self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-            client_id=spotify["client_id"],
-            client_secret=spotify["client_secret"],
-            redirect_uri=spotify["redirect_uri"],
-            scope="user-modify-playback-state user-read-playback-state"
-        ))
+        self.sp = None
+        self.configured = False
+
+        spotify = get_spotify()
+
+        client_id = spotify.get("client_id", "").strip()
+        client_secret = spotify.get("client_secret", "").strip()
+        redirect_uri = spotify.get("redirect_uri", "").strip()
+
+        if client_id and client_secret and redirect_uri:
+
+            try:
+                self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    redirect_uri=redirect_uri,
+                    scope="user-modify-playback-state user-read-playback-state"
+                ))
+
+                self.configured = True
+
+            except Exception as e:
+                print("Spotify konnte nicht initialisiert werden:", e)
 
         self.last_uri = None
         self.last_start_ms = None
@@ -35,7 +50,13 @@ class SpotifyController:
 
     def get_device_id(self):
 
-        devices = self.sp.devices()
+        if self.sp is None:
+            return None
+
+        try:
+            devices = self.sp.devices()
+        except Exception:
+            return None
 
         if not devices["devices"]:
             return None
@@ -52,6 +73,9 @@ class SpotifyController:
 
     def set_volume(self, volume):
 
+        if self.sp is None:
+            return
+
         try:
             self.sp.volume(volume)
         except:
@@ -62,6 +86,9 @@ class SpotifyController:
     # =========================
 
     def fade_in(self, target_volume=100, duration=2):
+
+        if self.sp is None:
+            return
 
         with self.fade_lock:
 
@@ -82,6 +109,9 @@ class SpotifyController:
     # =========================
 
     def fade_out(self, start_volume=100, duration=2):
+
+        if self.sp is None:
+            return
 
         with self.fade_lock:
 
@@ -108,6 +138,11 @@ class SpotifyController:
         duration_ms,
         force=False
     ):
+
+        if self.sp is None:
+            print("Spotify ist nicht konfiguriert.")
+            return
+
         self.playback_session += 1
 
         current_session = self.playback_session
@@ -165,7 +200,13 @@ class SpotifyController:
 
     def get_active_device(self):
 
-        devices = self.sp.devices()
+        if self.sp is None:
+            return None
+
+        try:
+            devices = self.sp.devices()
+        except Exception:
+            return None
 
         for device in devices["devices"]:
 
@@ -179,6 +220,9 @@ class SpotifyController:
     # =========================
 
     def auto_pause(self, duration_ms, session_id):
+
+        if self.sp is None:
+            return
 
         fade_duration = 2
 
@@ -208,6 +252,9 @@ class SpotifyController:
 
     def stop(self):
 
+        if self.sp is None:
+            return
+
         try:
 
             info = self.get_current_track_info()
@@ -228,7 +275,13 @@ class SpotifyController:
 
     def get_current_position(self):
 
-        playback = self.sp.current_playback()
+        if self.sp is None:
+            return None
+
+        try:
+            playback = self.sp.current_playback()
+        except Exception:
+            return None
 
         if playback:
 
@@ -242,7 +295,13 @@ class SpotifyController:
 
     def get_current_track_info(self):
 
-        playback = self.sp.current_playback()
+        if self.sp is None:
+            return None
+
+        try:
+            playback = self.sp.current_playback()
+        except Exception:
+            return None
 
         if playback and playback["item"]:
 
@@ -257,39 +316,3 @@ class SpotifyController:
             }
 
         return None
-
-    def get_track_info_from_uri(self, uri):
-
-        try:
-
-            track = self.sp.track(uri)
-
-            return {
-
-                "song": track["name"],
-                "artist": track["artists"][0]["name"],
-                "duration_ms": track["duration_ms"]
-
-            }
-
-        except Exception as e:
-
-            print("Track Info Fehler:", e)
-
-            return None
-        
-    def seek_to_position(self, position_ms):
-
-        try:
-
-            self.sp.seek_track(position_ms)
-
-        except:
-            pass
-    
-    def resume(self):
-
-        try:
-            self.sp.start_playback()
-        except:
-            pass

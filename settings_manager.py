@@ -12,8 +12,7 @@ DEFAULT_SETTINGS = {
 
         "client_secret": "",
 
-        "redirect_uri":
-        "http://127.0.0.1:8888/callback"
+        "redirect_uri": "http://127.0.0.1:8888/callback"
 
     },
 
@@ -28,6 +27,7 @@ DEFAULT_SETTINGS = {
         "start_ms": 0
 
     }
+
 }
 
 
@@ -37,7 +37,7 @@ def load_settings():
 
         save_settings(DEFAULT_SETTINGS)
 
-        return DEFAULT_SETTINGS
+        return DEFAULT_SETTINGS.copy()
 
     with open(
 
@@ -101,11 +101,11 @@ def update_spotify(
 
     settings["spotify"] = {
 
-        "client_id": client_id,
+        "client_id": client_id.strip(),
 
-        "client_secret": client_secret,
+        "client_secret": client_secret.strip(),
 
-        "redirect_uri": redirect_uri
+        "redirect_uri": redirect_uri.strip()
 
     }
 

@@ -7,18 +7,30 @@ from tkinter import messagebox
 from spotipy.oauth2 import SpotifyOAuth
 from settings_manager import get_spotify
 
-spotify = get_spotify()
-
 # =========================
 # Spotify Setup
 # =========================
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    client_id=spotify["client_id"],
-    client_secret=spotify["client_secret"],
-    redirect_uri=spotify["redirect_uri"],
-    scope="playlist-read-private playlist-read-collaborative"
-))
+def get_spotify_client():
+
+    spotify = get_spotify()
+
+    client_id = spotify.get("client_id", "").strip()
+    client_secret = spotify.get("client_secret", "").strip()
+    redirect_uri = spotify.get("redirect_uri", "").strip()
+
+    if not client_id or not client_secret or not redirect_uri:
+        raise RuntimeError(
+            "Spotify ist noch nicht konfiguriert. "
+            "Bitte Client ID, Client Secret und Redirect URI in den Einstellungen eintragen."
+        )
+
+    return spotipy.Spotify(auth_manager=SpotifyOAuth(
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_uri,
+        scope="playlist-read-private playlist-read-collaborative"
+    ))
 
 
 # =========================
@@ -26,6 +38,8 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
 # =========================
 
 def extract_playlist_tracks(playlist_id):
+
+    sp = get_spotify_client()
 
     results = sp.playlist_items(playlist_id)
     tracks = results["items"]
