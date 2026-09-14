@@ -9,7 +9,7 @@ class LiveMonitorGUI:
         self.root = tk.Tk()
 
         self.root.title("Abi Music Monitor")
-        self.root.geometry("700x620")
+        self.root.geometry("700x650")
         self.root.attributes("-topmost", True)
         self.root.update_idletasks()
         self.root.update()
@@ -60,11 +60,51 @@ class LiveMonitorGUI:
         self.status_label.pack()
 
         # =====================
-        # Infos
+        # PowerPoint Status
         # =====================
 
-        main = ttk.Frame(self.root, padding=15)
-        main.pack(fill="both", expand=True)
+        self.powerpoint_status_frame = ttk.Frame(
+            self.root
+        )
+
+        self.powerpoint_status_frame.pack(
+            pady=(5, 5)
+        )
+
+        self.powerpoint_led = tk.Canvas(
+            self.powerpoint_status_frame,
+            width=16,
+            height=16,
+            highlightthickness=0
+        )
+
+        self.powerpoint_led.pack(
+            side="left",
+            padx=(0, 6)
+        )
+
+        self.powerpoint_led_circle = (
+            self.powerpoint_led.create_oval(
+                2,
+                2,
+                14,
+                14,
+                fill="red",
+                outline=""
+            )
+        )
+
+        self.powerpoint_status_var = tk.StringVar(
+            value="PowerPoint: Nicht verbunden"
+        )
+
+        ttk.Label(
+            self.powerpoint_status_frame,
+            textvariable=self.powerpoint_status_var,
+            font=("Arial", 10)
+        ).pack(
+            side="left"
+        )
 
         # =====================
         # Hauptbereich
@@ -74,7 +114,11 @@ class LiveMonitorGUI:
             self.root,
             padding=15
         )
-        main.pack(fill="both", expand=True)
+
+        main.pack(
+            fill="both",
+            expand=True
+        )
 
         # obere Zeile
 
@@ -253,6 +297,37 @@ class LiveMonitorGUI:
             next_frame,
             textvariable=self.next_song_var
         ).grid(row=2,column=1,sticky="w",padx=10)
+
+
+    def set_powerpoint_status(self, connected):
+
+        try:
+
+            if connected:
+
+                self.powerpoint_led.itemconfig(
+                    self.powerpoint_led_circle,
+                    fill="limegreen"
+                )
+
+                self.powerpoint_status_var.set(
+                    "PowerPoint: Verbunden"
+                )
+
+            else:
+
+                self.powerpoint_led.itemconfig(
+                    self.powerpoint_led_circle,
+                    fill="red"
+                )
+
+                self.powerpoint_status_var.set(
+                    "PowerPoint: Nicht verbunden"
+                )
+
+        except:
+            pass
+
 
     def update_status(
 

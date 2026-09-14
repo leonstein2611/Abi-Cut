@@ -1,5 +1,7 @@
 import json
 import time
+from tkinter import messagebox
+
 
 from baseWindow import BaseWindow
 
@@ -21,6 +23,17 @@ class LiveController(BaseWindow):
         self.spotify = SpotifyController()
         self.powerpoint = PowerPointController()
 
+        # PowerPoint-Verbindungsstatus
+        self.powerpoint_connected = (
+            self.powerpoint.presentation is not None
+        )
+
+        self.last_powerpoint_check = 0
+        self.POWERPOINT_CHECK_INTERVAL = 1.0
+
+        self.last_powerpoint_poll = 0
+        self.POWERPOINT_POLL_INTERVAL = 0.1
+
         # -------------------------
         # Monitor
         # -------------------------
@@ -29,6 +42,16 @@ class LiveController(BaseWindow):
 
         # Der Monitor ist jetzt unser Fenster
         self.root = self.monitor.root
+
+        self.update_powerpoint_status()
+
+        if not self.powerpoint_connected:
+            messagebox.showwarning(
+                "PowerPoint nicht geöffnet",
+                "Es wurde keine aktive PowerPoint-Präsentation gefunden.\n\n"
+                "Der Live-Modus bleibt geöffnet. "
+                "Bitte öffne jetzt die gewünschte PowerPoint-Präsentation."
+            )
 
         # -------------------------
         # Projekt laden
@@ -83,9 +106,20 @@ class LiveController(BaseWindow):
 
         try:
 
-            if self.check_slide_change():
+            self.check_powerpoint_connection()
 
-                self.play_current_slide()
+            now = time.time()
+
+            if (
+                self.powerpoint_connected
+                and now - self.last_powerpoint_poll
+                >= self.POWERPOINT_POLL_INTERVAL
+            ):
+
+                self.last_powerpoint_poll = now
+
+                if self.check_slide_change():
+                    self.play_current_slide()
 
             self.update_progress()
 
@@ -456,3 +490,70 @@ class LiveController(BaseWindow):
 
         self.monitor.set_progress(0)
         self.monitor.set_remaining_time(0)
+
+    def update_powerpoint_status(self):
+
+        connected = (
+            self.powerpoint is not None
+            and self.powerpoint.presentation is not None
+        )
+
+        if connected == self.powerpoint_connected:
+            return
+
+        self.powerpoint_connected = connected
+
+        self.monitor.set_powerpoint_status(connected)
+
+
+    def check_powerpoint_connection(self):
+
+        now = time.time()
+
+        if (
+            now - self.last_powerpoint_check
+            < self.POWERPOINT_CHECK_INTERVAL
+        ):
+            return
+
+        self.last_powerpoint_check = now
+
+        # ---------------------------------
+        # Bereits verbunden
+        # ---------------------------------
+
+        if self.powerpoint_connected:
+
+            try:
+
+                # Prüfen, ob die Präsentation noch erreichbar ist
+                _ = self.powerpoint.presentation.Name
+
+                return
+
+            except Exception:
+
+                self.powerpoint.presentation = None
+                self.powerpoint_connected = False
+
+                self.monitor.set_powerpoint_status(False)
+
+        # ---------------------------------
+        # Verbindung erneut versuchen
+        # ---------------------------------
+
+        try:
+
+            self.powerpoint.connect()
+
+            if self.powerpoint.presentation is not None:
+
+                self.powerpoint_connected = True
+
+                self.monitor.set_powerpoint_status(True)
+
+        except Exception:
+
+            self.powerpoint_connected = False
+
+            self.monitor.set_powerpoint_status(False)
