@@ -646,20 +646,27 @@ class MusicGUI(BaseWindow):
             slide["song_added"] = bool(self.song_var.get())
             slide["time_confirmed"] = self.confirmed_var.get()
 
+            # Aktuelle Folie merken
+            selected_slide = self.current_slide
+
             self.save_config()
             self.refresh_slide_list()
+
+            # Auswahl wiederherstellen
+            if selected_slide in self.slide_tree.get_children():
+                self.slide_tree.selection_set(selected_slide)
+                self.slide_tree.focus(selected_slide)
+                self.slide_tree.see(selected_slide)
 
             print("CONFIG GESPEICHERT")
 
             if show_popup:
-
                 messagebox.showinfo(
                     "Gespeichert",
                     "Config gespeichert"
                 )
 
         except Exception as e:
-
             print("SAVE ERROR:", e)
 
     def toggle_confirmed(self):
@@ -1366,6 +1373,17 @@ class MusicGUI(BaseWindow):
 
     def refresh_slide_list(self):
 
+        # Aktuelle Auswahl merken
+        selected_slide = None
+
+        selection = self.slide_tree.selection()
+
+        if selection:
+            selected_slide = selection[0]
+        elif getattr(self, "current_slide", None):
+            selected_slide = self.current_slide
+
+        # Liste neu aufbauen
         for item in self.slide_tree.get_children():
             self.slide_tree.delete(item)
 
@@ -1379,12 +1397,6 @@ class MusicGUI(BaseWindow):
         for slide_nr in self.slide_keys:
 
             slide = slides[slide_nr]
-
-            text = (
-                f"      "
-                f"{int(slide_nr):>3}   "
-                f"{slide['student']}"
-            )
 
             song_text, time_text, active_text = self.get_status(slide)
 
@@ -1400,6 +1412,15 @@ class MusicGUI(BaseWindow):
                 )
             )
 
+        # Auswahl nach dem Refresh wiederherstellen
+        if (
+            selected_slide
+            and self.slide_tree.exists(selected_slide)
+        ):
+            self.slide_tree.selection_set(selected_slide)
+            self.slide_tree.focus(selected_slide)
+            self.slide_tree.see(selected_slide)
+            
     def get_status(self, slide):
 
         # Song
