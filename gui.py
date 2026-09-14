@@ -182,6 +182,9 @@ class MusicGUI(BaseWindow):
             pady=20
         )
 
+        right_frame.columnconfigure(0, weight=0, minsize=140)
+        right_frame.columnconfigure(1, weight=1)
+
         #Hauptmenü button    
         top_frame = ttk.Frame(right_frame)
         top_frame.grid(row=0, column=1, sticky="ne")
@@ -330,10 +333,6 @@ class MusicGUI(BaseWindow):
             self.stop_slider_drag
         )
 
-        self.timeline_slider.bind(
-            "<B1-Motion>",
-            self.slider_drag
-        )
 
         # =========================
         # SONG CONFIG
@@ -356,6 +355,7 @@ class MusicGUI(BaseWindow):
         self.song_entry.grid(
             row=9,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -376,6 +376,7 @@ class MusicGUI(BaseWindow):
         self.artist_entry.grid(
             row=10,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -396,6 +397,7 @@ class MusicGUI(BaseWindow):
         self.uri_entry.grid(
             row=11,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -411,6 +413,7 @@ class MusicGUI(BaseWindow):
         self.start_entry.grid(
             row=12,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -426,6 +429,7 @@ class MusicGUI(BaseWindow):
         self.duration_entry.grid(
             row=13,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -441,6 +445,7 @@ class MusicGUI(BaseWindow):
         self.fadein_entry.grid(
             row=14,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -456,6 +461,7 @@ class MusicGUI(BaseWindow):
         self.fadeout_entry.grid(
             row=15,
             column=1,
+            sticky="w",
             pady=5
         )
 
@@ -489,8 +495,10 @@ class MusicGUI(BaseWindow):
 
         button_frame.grid(
             row=16,
-            column=1,
-            pady=20
+            column=0,
+            columnspan=2,
+            sticky="w",
+            pady=(20, 0)
         )
 
         ttk.Button(
