@@ -40,6 +40,7 @@ class MusicGUI(BaseWindow):
         self.spotify = SpotifyController()
 
         self.user_dragging_slider = False
+        self.slider_seek_job = None
 
         self.last_progress_ms = 0
         self.last_update_time = time.time()
@@ -320,8 +321,18 @@ class MusicGUI(BaseWindow):
         )
 
         self.timeline_slider.bind(
+            "<B1-Motion>",
+            self.slider_drag
+        )
+
+        self.timeline_slider.bind(
             "<ButtonRelease-1>",
             self.stop_slider_drag
+        )
+
+        self.timeline_slider.bind(
+            "<B1-Motion>",
+            self.slider_drag
         )
 
         # =========================
@@ -768,13 +779,13 @@ class MusicGUI(BaseWindow):
 
         self.duration_var.set(ms_to_time(duration_ms))
 
-    def ms_to_display_time(self,ms):
+    def ms_to_display_time(self, ms):
 
-        seconds = ms // 1000
-        minutes = seconds // 60
-        seconds = seconds % 60
+        minutes = ms // 60000
+        seconds = (ms % 60000) // 1000
+        milliseconds = ms % 1000
 
-        return f"{minutes:02}:{seconds:02}"
+        return f"{minutes:02}:{seconds:02}.{milliseconds:03}"
 
     # =========================
     # Live Spotify Info
@@ -1002,6 +1013,30 @@ class MusicGUI(BaseWindow):
         self.user_dragging_slider = True
 
     # =========================
+    # Slider Drag
+    # =========================
+
+    def slider_drag(self, event):
+
+        slider_value = self.timeline_slider.get()
+        position_ms = int(slider_value * 1000)
+
+        # Anzeige sofort lokal aktualisieren
+        self.current_position_var.set(
+            self.ms_to_display_time(position_ms)
+        )
+
+        # Bereits geplanten Spotify-Seek abbrechen
+        if self.slider_seek_job is not None:
+            self.root.after_cancel(self.slider_seek_job)
+
+        # Spotify erst nach kurzer Pause aktualisieren
+        self.slider_seek_job = self.root.after(
+            120,
+            self.seek_slider_position
+        )
+
+    # =========================
     # Slider Drag Stop
     # =========================
 
@@ -1009,18 +1044,27 @@ class MusicGUI(BaseWindow):
 
         self.user_dragging_slider = False
 
-        info = self.spotify.get_current_track_info()
+        # Geplanten Zwischen-Seek abbrechen
+        if self.slider_seek_job is not None:
+            self.root.after_cancel(self.slider_seek_job)
+            self.slider_seek_job = None
 
-        if not info:
-            return
+        # Beim Loslassen exakt auf die endgültige Position springen
+        self.seek_slider_position()
 
-        duration_ms = info["duration_ms"]
+    # =========================
+    # Seek Slider Position
+    # =========================
+
+    def seek_slider_position(self):
+
+        self.slider_seek_job = None
 
         slider_value = self.timeline_slider.get()
-
         position_ms = int(slider_value * 1000)
 
         self.spotify.seek_to_position(position_ms)
+
 
     # =========================
     # Shortcuts 
