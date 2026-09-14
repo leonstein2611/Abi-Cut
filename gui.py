@@ -102,12 +102,17 @@ class MusicGUI(BaseWindow):
 
     def create_widgets(self):
 
-        # =========================
+        # ======================================================
         # LEFT FRAME
-        # =========================
+        # ======================================================
 
         left_frame = ttk.Frame(self.root)
-        left_frame.pack(side="left", fill="y", padx=10, pady=10)
+        left_frame.pack(
+            side="left",
+            fill="y",
+            padx=10,
+            pady=10
+        )
 
         ttk.Label(
             left_frame,
@@ -132,35 +137,65 @@ class MusicGUI(BaseWindow):
         self.slide_tree.column("zeit", width=80, anchor="center")
         self.slide_tree.column("aktiv", width=80, anchor="center")
 
-        self.slide_tree.pack(fill="both", expand=True)
+        self.slide_tree.pack(
+            fill="both",
+            expand=True
+        )
+
+        # ======================================================
+        # BUTTONS UNTER FOLIENLISTE
+        # ======================================================
 
         list_button_frame = ttk.Frame(left_frame)
-        list_button_frame.pack(fill="x", pady=5)
+
+        list_button_frame.pack(
+            fill="x",
+            pady=5
+        )
 
         ttk.Button(
             list_button_frame,
             text="+ Folie",
             command=self.add_slide
-        ).pack(side="left", expand=True, fill="x", padx=2)
+        ).pack(
+            side="left",
+            expand=True,
+            fill="x",
+            padx=2
+        )
 
         ttk.Button(
             list_button_frame,
             text="Bearbeiten",
             command=self.edit_slide
-        ).pack(side="left", expand=True, fill="x", padx=2)
+        ).pack(
+            side="left",
+            expand=True,
+            fill="x",
+            padx=2
+        )
 
         ttk.Button(
             list_button_frame,
             text="🗑 Löschen",
             command=self.delete_slide
-        ).pack(side="left", expand=True, fill="x", padx=2)
+        ).pack(
+            side="left",
+            expand=True,
+            fill="x",
+            padx=2
+        )
 
         ttk.Button(
             list_button_frame,
             text="⇄ Tauschen",
             command=self.swap_slides
-        ).pack(side="left", expand=True, fill="x", padx=2)
-
+        ).pack(
+            side="left",
+            expand=True,
+            fill="x",
+            padx=2
+        )
 
         self.refresh_slide_list()
 
@@ -169,11 +204,12 @@ class MusicGUI(BaseWindow):
             self.on_slide_select
         )
 
-        # =========================
+        # ======================================================
         # RIGHT FRAME
-        # =========================
+        # ======================================================
 
         right_frame = ttk.Frame(self.root)
+
         right_frame.pack(
             side="left",
             fill="both",
@@ -182,12 +218,30 @@ class MusicGUI(BaseWindow):
             pady=20
         )
 
-        right_frame.columnconfigure(0, weight=0, minsize=140)
-        right_frame.columnconfigure(1, weight=1)
+        # Linke Spalte = Beschriftungen
+        # Rechte Spalte = Inhalt
+        right_frame.columnconfigure(
+            0,
+            weight=0,
+            minsize=140
+        )
 
-        #Hauptmenü button    
+        right_frame.columnconfigure(
+            1,
+            weight=1
+        )
+
+        # ======================================================
+        # HAUPTMENÜ
+        # ======================================================
+
         top_frame = ttk.Frame(right_frame)
-        top_frame.grid(row=0, column=1, sticky="ne")
+
+        top_frame.grid(
+            row=0,
+            column=1,
+            sticky="ne"
+        )
 
         ttk.Button(
             top_frame,
@@ -195,17 +249,9 @@ class MusicGUI(BaseWindow):
             command=self.back_to_main_menu
         ).pack()
 
-        self.student_var = tk.StringVar()
-
-        ttk.Label(
-            right_frame,
-            text="Schüler",
-            font=("Arial",10,"bold")
-        ).grid(row=8, column=0, sticky="w")
-
-        # =========================
-        # LIVE INFO
-        # =========================
+        # ======================================================
+        # LIVE VARIABLEN
+        # ======================================================
 
         self.current_song_var = tk.StringVar(
             value="Kein Song"
@@ -214,24 +260,80 @@ class MusicGUI(BaseWindow):
         self.current_position_var = tk.StringVar(
             value="00:00.000"
         )
+
         self.spotify_status_var = tk.StringVar(
             value="Nicht verbunden"
         )
 
-        # Spotify LED
+        # ======================================================
+        # AKTUELLER SPOTIFY SONG
+        # ======================================================
+
+        ttk.Label(
+            right_frame,
+            text="Aktueller Spotify Song:",
+            font=("Arial", 10, "bold")
+        ).grid(
+            row=0,
+            column=0,
+            sticky="w"
+        )
+
+        ttk.Label(
+            right_frame,
+            textvariable=self.current_song_var
+        ).grid(
+            row=1,
+            column=0,
+            sticky="w",
+            pady=(0, 15)
+        )
+
+        # ======================================================
+        # AKTUELLE POSITION
+        # ======================================================
+
+        ttk.Label(
+            right_frame,
+            text="Aktuelle Position:",
+            font=("Arial", 10, "bold")
+        ).grid(
+            row=2,
+            column=0,
+            sticky="w"
+        )
+
+        ttk.Label(
+            right_frame,
+            textvariable=self.current_position_var
+        ).grid(
+            row=3,
+            column=0,
+            sticky="w",
+            pady=(0, 15)
+        )
+
+        # ======================================================
+        # SPOTIFY STATUS
+        # ======================================================
 
         ttk.Label(
             right_frame,
             text="Spotify",
-            font=("Arial",10,"bold")
-        ).grid(row=4,column=0,sticky="w")
+            font=("Arial", 10, "bold")
+        ).grid(
+            row=4,
+            column=0,
+            sticky="w"
+        )
 
         spotify_frame = ttk.Frame(right_frame)
+
         spotify_frame.grid(
             row=5,
             column=0,
             sticky="w",
-            pady=(0,20)
+            pady=(0, 20)
         )
 
         self.spotify_canvas = tk.Canvas(
@@ -241,7 +343,9 @@ class MusicGUI(BaseWindow):
             highlightthickness=0
         )
 
-        self.spotify_canvas.pack(side="left")
+        self.spotify_canvas.pack(
+            side="left"
+        )
 
         self.spotify_led = self.spotify_canvas.create_oval(
             2,
@@ -254,33 +358,14 @@ class MusicGUI(BaseWindow):
         ttk.Label(
             spotify_frame,
             textvariable=self.spotify_status_var
-        ).pack(side="left", padx=6)
+        ).pack(
+            side="left",
+            padx=6
+        )
 
-        ttk.Label(
-            right_frame,
-            text="Aktueller Spotify Song:",
-            font=("Arial", 10, "bold")
-        ).grid(row=0, column=0, sticky="w")
-
-        ttk.Label(
-            right_frame,
-            textvariable=self.current_song_var
-        ).grid(row=1, column=0, sticky="w", pady=(0, 15))
-
-        ttk.Label(
-            right_frame,
-            text="Aktuelle Position:",
-            font=("Arial", 10, "bold")
-        ).grid(row=2, column=0, sticky="w")
-
-        ttk.Label(
-            right_frame,
-            textvariable=self.current_position_var
-        ).grid(row=3, column=0, sticky="w", pady=(0, 15))
-
-        # =========================
-        # Segment Visualisierung
-        # =========================
+        # ======================================================
+        # SEGMENT VISUALISIERUNG
+        # ======================================================
 
         self.segment_canvas = tk.Canvas(
             right_frame,
@@ -297,9 +382,9 @@ class MusicGUI(BaseWindow):
             pady=(0, 5)
         )
 
-        # =========================
-        # Timeline Slider
-        # =========================
+        # ======================================================
+        # TIMELINE SLIDER
+        # ======================================================
 
         self.timeline_slider = tk.Scale(
             right_frame,
@@ -313,11 +398,10 @@ class MusicGUI(BaseWindow):
             row=7,
             column=0,
             columnspan=2,
-            pady=(0, 20),
-            sticky="we"
+            sticky="we",
+            pady=(0, 20)
         )
 
-        # Events
         self.timeline_slider.bind(
             "<ButtonPress-1>",
             self.start_slider_drag
@@ -333,144 +417,261 @@ class MusicGUI(BaseWindow):
             self.stop_slider_drag
         )
 
+        # ======================================================
+        # SCHÜLER / SONG CONFIG
+        # ======================================================
 
-        # =========================
-        # SONG CONFIG
-        # =========================
+        self.student_var = tk.StringVar()
 
-        ttk.Label(right_frame, text="Song").grid(
+        ttk.Label(
+            right_frame,
+            text="Schüler",
+            font=("Arial", 10, "bold")
+        ).grid(
+            row=8,
+            column=0,
+            sticky="w",
+            pady=(10, 5)
+        )
+
+        # Gesamter Formularbereich
+        config_frame = ttk.Frame(right_frame)
+
+        config_frame.grid(
             row=9,
             column=0,
+            columnspan=2,
             sticky="w"
+        )
+
+        # Wichtig:
+        # Spalte 1 bekommt ihre Breite durch die großen Entries.
+        # Die kleinen Entries ohne sticky sitzen darin automatisch mittig.
+        config_frame.columnconfigure(
+            0,
+            minsize=140
+        )
+
+        config_frame.columnconfigure(
+            1,
+            weight=0
+        )
+
+        # ======================================================
+        # SONG
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Song"
+        ).grid(
+            row=0,
+            column=0,
+            sticky="w",
+            pady=5
         )
 
         self.song_var = tk.StringVar()
 
         self.song_entry = ttk.Entry(
-            right_frame,
+            config_frame,
             width=60,
             textvariable=self.song_var
         )
 
         self.song_entry.grid(
-            row=9,
+            row=0,
             column=1,
             sticky="w",
             pady=5
         )
 
-        ttk.Label(right_frame, text="Artist").grid(
-            row=10,
+        # ======================================================
+        # ARTIST
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Artist"
+        ).grid(
+            row=1,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=5
         )
 
         self.artist_var = tk.StringVar()
 
         self.artist_entry = ttk.Entry(
-            right_frame,
+            config_frame,
             width=60,
             textvariable=self.artist_var
         )
 
         self.artist_entry.grid(
-            row=10,
+            row=1,
             column=1,
             sticky="w",
             pady=5
         )
 
-        ttk.Label(right_frame, text="URI").grid(
-            row=11,
+        # ======================================================
+        # URI
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="URI"
+        ).grid(
+            row=2,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=5
         )
 
         self.uri_var = tk.StringVar()
 
         self.uri_entry = ttk.Entry(
-            right_frame,
+            config_frame,
             width=60,
             textvariable=self.uri_var
         )
 
         self.uri_entry.grid(
-            row=11,
+            row=2,
             column=1,
             sticky="w",
             pady=5
         )
 
-        ttk.Label(right_frame, text="Startzeit").grid(
-            row=12,
+        # ======================================================
+        # STARTZEIT
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Startzeit"
+        ).grid(
+            row=3,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=(15, 5)
         )
 
         self.start_var = tk.StringVar()
-        self.start_entry = ttk.Entry(right_frame, textvariable=self.start_var)
 
-        self.start_entry.grid(
-            row=12,
-            column=1,
-            sticky="w",
-            pady=5
+        self.start_entry = ttk.Entry(
+            config_frame,
+            width=18,
+            textvariable=self.start_var
         )
 
-        ttk.Label(right_frame, text="Dauer").grid(
-            row=13,
+        self.start_entry.grid(
+            row=3,
+            column=1,
+            sticky="w",
+            padx=(135, 0),
+            pady=(15, 5)
+        )
+
+        # KEIN sticky!
+        # Dadurch wird das kleine Feld innerhalb der breiten Spalte zentriert.
+
+        # ======================================================
+        # DAUER
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Dauer"
+        ).grid(
+            row=4,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=5
         )
 
         self.duration_var = tk.StringVar()
-        self.duration_entry = ttk.Entry(right_frame, textvariable=self.duration_var)
+
+        self.duration_entry = ttk.Entry(
+            config_frame,
+            width=18,
+            textvariable=self.duration_var
+        )
 
         self.duration_entry.grid(
-            row=13,
+            row=4,
             column=1,
             sticky="w",
+            padx=(135, 0),
             pady=5
         )
 
-        ttk.Label(right_frame, text="Fade In").grid(
-            row=14,
+        # ======================================================
+        # FADE IN
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Fade In"
+        ).grid(
+            row=5,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=5
         )
 
         self.fadein_var = tk.StringVar()
-        self.fadein_entry = ttk.Entry(right_frame, textvariable=self.fadein_var)
+
+        self.fadein_entry = ttk.Entry(
+            config_frame,
+            width=18,
+            textvariable=self.fadein_var
+        )
 
         self.fadein_entry.grid(
-            row=14,
+            row=5,
             column=1,
             sticky="w",
+            padx=(135, 0),
             pady=5
         )
 
-        ttk.Label(right_frame, text="Fade Out").grid(
-            row=15,
+        # ======================================================
+        # FADE OUT
+        # ======================================================
+
+        ttk.Label(
+            config_frame,
+            text="Fade Out"
+        ).grid(
+            row=6,
             column=0,
-            sticky="w"
+            sticky="w",
+            pady=5
         )
 
         self.fadeout_var = tk.StringVar()
-        self.fadeout_entry = ttk.Entry(right_frame, textvariable=self.fadeout_var)
+
+        self.fadeout_entry = ttk.Entry(
+            config_frame,
+            width=18,
+            textvariable=self.fadeout_var
+        )
 
         self.fadeout_entry.grid(
-            row=15,
+            row=6,
             column=1,
             sticky="w",
+            padx=(135, 0),
             pady=5
         )
 
-        # =========================
-        # Autosave Events
-        # =========================
+        # ======================================================
+        # AUTOSAVE EVENTS
+        # ======================================================
 
         vars_to_watch = [
-
             self.song_var,
             self.artist_var,
             self.uri_var,
@@ -487,14 +688,14 @@ class MusicGUI(BaseWindow):
                 lambda *args: self.trigger_autosave()
             )
 
-        # =========================
+        # ======================================================
         # BUTTONS
-        # =========================
+        # ======================================================
 
-        button_frame = ttk.Frame(right_frame)
+        button_frame = ttk.Frame(config_frame)
 
         button_frame.grid(
-            row=16,
+            row=7,
             column=0,
             columnspan=2,
             sticky="w",
@@ -505,37 +706,75 @@ class MusicGUI(BaseWindow):
             button_frame,
             text="Save",
             command=self.save_current_slide
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
 
         ttk.Button(
             button_frame,
             text="Test Play",
             command=self.test_play
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
 
         ttk.Button(
             button_frame,
             text="Stop",
             command=self.stop_music
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
 
         ttk.Button(
             button_frame,
             text="Use Current Position",
             command=self.use_current_position
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
 
         ttk.Button(
             button_frame,
             text="Set Start",
             command=self.set_start_time
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
 
         ttk.Button(
             button_frame,
             text="Set End",
             command=self.set_end_time
-        ).pack(side="left", padx=5)
+        ).pack(
+            side="left",
+            padx=5
+        )
+
+        ttk.Checkbutton(
+            button_frame,
+            text="Folie aktiv",
+            variable=self.enabled_var,
+            command=self.toggle_slide_enabled
+        ).pack(
+            side="left",
+            padx=10
+        )
+
+        ttk.Checkbutton(
+            button_frame,
+            text="Segment bestätigt",
+            variable=self.confirmed_var,
+            command=self.toggle_confirmed
+        ).pack(
+            side="left",
+            padx=10
+        )
 
         autosave_checkbox = ttk.Checkbutton(
             button_frame,
@@ -544,34 +783,25 @@ class MusicGUI(BaseWindow):
             takefocus=False
         )
 
-        ttk.Checkbutton(
-            button_frame,
-            text="Folie aktiv",
-            variable=self.enabled_var,
-            command=self.toggle_slide_enabled
-        ).pack(side="left", padx=10)
+        autosave_checkbox.pack(
+            side="left",
+            padx=10
+        )
 
-        ttk.Checkbutton(
-            button_frame,
-            text="Segment bestätigt",
-            variable=self.confirmed_var,
-            command=self.toggle_confirmed
-        ).pack(side="left", padx=10)
-
-
-        autosave_checkbox.pack(side="left", padx=10)
-
-        # =========================
-        # Erste Folie laden
-        # =========================
+        # ======================================================
+        # ERSTE FOLIE LADEN
+        # ======================================================
 
         children = self.slide_tree.get_children()
 
         if children:
 
-            self.slide_tree.selection_set(children[0])
-            self.on_slide_select(None)
+            self.slide_tree.selection_set(
+                children[0]
+            )
 
+            self.on_slide_select(None)
+            
     # =========================
     # Deaktivieren/Aktivieren der Folie
     # =========================
