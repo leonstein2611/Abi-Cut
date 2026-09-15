@@ -8,8 +8,8 @@ dist/
 *.spec
 
 # Inno Setup output
-installer/
-Output/
+installer/*
+!installer/AbiCut_Setup_1.0.0.exe
 
 # Spotify / local configuration
 settings.json
