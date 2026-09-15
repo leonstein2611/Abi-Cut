@@ -12,6 +12,7 @@ from tkinter import simpledialog
 from project_controller import set_current_project
 from project_controller import get_current_project
 from project_controller import clear_current_project
+from paths import get_projects_dir
 
 from baseWindow import BaseWindow
 
@@ -23,6 +24,7 @@ class ProjectManager(BaseWindow):
         super().__init__()
 
         self.root = tk.Tk()
+        self.set_app_icon()
 
         self.root.title("Projektmanager")
         self.root.geometry("820x520")
@@ -32,6 +34,8 @@ class ProjectManager(BaseWindow):
             "WM_DELETE_WINDOW",
             lambda: self.close("menu")
         )
+
+        self.projects_dir = get_projects_dir()
 
         self.project_paths = []
 
@@ -160,13 +164,13 @@ class ProjectManager(BaseWindow):
 
         self.project_paths.clear()
 
-        if not os.path.exists("projects"):
+        if not os.path.exists(self.projects_dir):
             return
 
-        for folder in sorted(os.listdir("projects")):
+        for folder in sorted(os.listdir(self.projects_dir)):
 
             config = os.path.join(
-                "projects",
+                self.projects_dir,
                 folder,
                 "config.json"
             )
@@ -269,11 +273,20 @@ class ProjectManager(BaseWindow):
 
         new_folder = os.path.join(
 
-            "projects",
+            self.projects_dir,
 
             new_name
 
         )
+
+        if os.path.exists(new_folder):
+
+            messagebox.showerror(
+                "Projekt umbenennen",
+                "Ein Projekt mit diesem Namen existiert bereits."
+            )
+
+            return
 
         os.rename(
 
@@ -326,7 +339,7 @@ class ProjectManager(BaseWindow):
 
         target = os.path.join(
 
-            "projects",
+            self.projects_dir,
 
             name + " (Kopie)"
 
@@ -338,7 +351,7 @@ class ProjectManager(BaseWindow):
 
             target = os.path.join(
 
-                "projects",
+                self.projects_dir,
 
                 f"{name} (Kopie){counter}"
 

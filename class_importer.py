@@ -2,12 +2,16 @@ import json
 import uuid
 from datetime import datetime
 
+from paths import get_projects_dir
+PROJECTS_DIR = get_projects_dir()
+
 import pandas as pd
 
 import tkinter as tk
 from tkinter import messagebox
 
 from settings_manager import get_defaults
+from paths import get_app_icon_png
 
 defaults = get_defaults()
 
@@ -22,9 +26,8 @@ def create_project_from_classlist(
     duplicate_count = 0
     empty_rows_count = 0
 
-    project_folder = os.path.join(
-    "projects",
-    project_name
+    project_folder = (
+        PROJECTS_DIR / project_name
     )
 
     os.makedirs(project_folder, exist_ok=True)
@@ -228,6 +231,17 @@ def create_project_from_classlist(
         )
 
         root = tk.Tk()
+
+        try:
+            icon_path = get_app_icon_png()
+
+            if icon_path.exists():
+                app_icon = tk.PhotoImage(file=str(icon_path))
+                root.iconphoto(True, app_icon)
+
+        except Exception as e:
+            print("Class Importer Icon Fehler:", e)
+
         root.withdraw()
         root.attributes("-topmost", True)
 

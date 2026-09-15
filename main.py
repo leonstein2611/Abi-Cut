@@ -2,12 +2,27 @@
 # main.py
 # =========================
 
+import sys
+import ctypes
+
+if sys.platform == "win32":
+
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "AbiCut.Desktop.1.0"
+        )
+
+    except Exception:
+        pass
+
 from startscreen import StartScreen
 from project_wizard import ProjectWizard
 from project_manager import ProjectManager
 from gui import MusicGUI
 from live_controller import LiveController
+from paths import install_bundled_projects
 
+install_bundled_projects()
 
 state = "menu"
 config_path = None

@@ -518,42 +518,54 @@ class LiveController(BaseWindow):
 
         self.last_powerpoint_check = now
 
-        # ---------------------------------
-        # Bereits verbunden
-        # ---------------------------------
+        try:
 
-        if self.powerpoint_connected:
+            # Falls noch keine Präsentation bekannt ist:
+            if self.powerpoint.presentation is None:
+                self.powerpoint.connect()
 
-            try:
+            # PowerPoint / Präsentation nicht verfügbar
+            if self.powerpoint.presentation is None:
 
-                # Prüfen, ob die Präsentation noch erreichbar ist
-                _ = self.powerpoint.presentation.Name
+                self.powerpoint_connected = False
+
+                self.monitor.set_powerpoint_status(
+                    "disconnected"
+                )
 
                 return
 
+            # PowerPoint ist verbunden
+            self.powerpoint_connected = True
+
+            # Prüfen, ob Bildschirmpräsentation läuft
+            try:
+
+                slideshow_count = (
+                    self.powerpoint.ppt
+                    .SlideShowWindows.Count
+                )
+
             except Exception:
 
-                self.powerpoint.presentation = None
-                self.powerpoint_connected = False
+                slideshow_count = 0
 
-                self.monitor.set_powerpoint_status(False)
+            if slideshow_count > 0:
 
-        # ---------------------------------
-        # Verbindung erneut versuchen
-        # ---------------------------------
+                self.monitor.set_powerpoint_status(
+                    "running"
+                )
 
-        try:
+            else:
 
-            self.powerpoint.connect()
-
-            if self.powerpoint.presentation is not None:
-
-                self.powerpoint_connected = True
-
-                self.monitor.set_powerpoint_status(True)
+                self.monitor.set_powerpoint_status(
+                    "ready"
+                )
 
         except Exception:
 
             self.powerpoint_connected = False
 
-            self.monitor.set_powerpoint_status(False)
+            self.monitor.set_powerpoint_status(
+                "disconnected"
+            )

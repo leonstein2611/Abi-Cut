@@ -1,15 +1,11 @@
 {
     "project": {
         "name": "Example Project",
+        "school": "Example School",
+        "graduation_year": "2026",
         "created": "01.01.2026",
+        "last_opened": "",
         "version": "1.0.0"
-    },
-    "statistics": {
-        "total_slides": 3,
-        "songs_added": 2,
-        "time_confirmed": 1,
-        "disabled": 1,
-        "finished": 1
     },
     "slides": {
         "2": {

@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from paths import get_app_icon_png
 
 
 class LiveMonitorGUI:
@@ -7,6 +8,25 @@ class LiveMonitorGUI:
     def __init__(self):
 
         self.root = tk.Tk()
+        
+        try:
+
+            icon_path = get_app_icon_png()
+
+            if icon_path.exists():
+
+                self.app_icon = tk.PhotoImage(
+                    file=str(icon_path)
+                )
+
+                self.root.iconphoto(
+                    True,
+                    self.app_icon
+                )
+
+        except Exception as e:
+
+            print("Monitor Icon Fehler:", e)
 
         self.root.title("Abi Music Monitor")
         self.root.geometry("700x650")
@@ -299,11 +319,11 @@ class LiveMonitorGUI:
         ).grid(row=2,column=1,sticky="w",padx=10)
 
 
-    def set_powerpoint_status(self, connected):
+    def set_powerpoint_status(self, status):
 
         try:
 
-            if connected:
+            if status == "running":
 
                 self.powerpoint_led.itemconfig(
                     self.powerpoint_led_circle,
@@ -311,7 +331,18 @@ class LiveMonitorGUI:
                 )
 
                 self.powerpoint_status_var.set(
-                    "PowerPoint: Verbunden"
+                    "PowerPoint: Präsentation läuft"
+                )
+
+            elif status == "ready":
+
+                self.powerpoint_led.itemconfig(
+                    self.powerpoint_led_circle,
+                    fill="orange"
+                )
+
+                self.powerpoint_status_var.set(
+                    "PowerPoint: Bereit"
                 )
 
             else:

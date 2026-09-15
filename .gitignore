@@ -2,10 +2,21 @@
 __pycache__/
 *.py[cod]
 
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Inno Setup output
+installer/
+Output/
+
 # Spotify / local configuration
 settings.json
 config.json
 .cache
+.cache*
+.spotify_cache
 .spotify_cache*
 
 # Local AbiCut project data
@@ -22,4 +33,5 @@ projects/
 
 # Windows / macOS
 Thumbs.db
+Desktop.ini
 .DS_Store

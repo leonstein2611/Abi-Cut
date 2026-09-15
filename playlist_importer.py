@@ -7,6 +7,10 @@ from tkinter import messagebox
 from spotipy.oauth2 import SpotifyOAuth
 from settings_manager import get_spotify
 
+from paths import get_app_icon_png
+
+from paths import get_spotify_cache_file
+
 # =========================
 # Spotify Setup
 # =========================
@@ -26,11 +30,19 @@ def get_spotify_client():
         )
 
     return spotipy.Spotify(auth_manager=SpotifyOAuth(
-        client_id=client_id,
-        client_secret=client_secret,
-        redirect_uri=redirect_uri,
-        scope="playlist-read-private playlist-read-collaborative"
-    ))
+            client_id=client_id,
+            client_secret=client_secret,
+            redirect_uri=redirect_uri,
+            scope=(
+                "user-read-playback-state "
+                "user-modify-playback-state "
+                "user-read-currently-playing "
+                "playlist-read-private "
+                "playlist-read-collaborative"
+            ),
+            cache_path=str(get_spotify_cache_file()),
+            open_browser=True
+        ))
 
 
 # =========================
@@ -153,6 +165,17 @@ def import_playlist_to_project(
         """
 
         root = tk.Tk()
+
+        try:
+            icon_path = get_app_icon_png()
+
+            if icon_path.exists():
+                app_icon = tk.PhotoImage(file=str(icon_path))
+                root.iconphoto(True, app_icon)
+
+        except Exception as e:
+            print("Playlist Importer Icon Fehler:", e)
+
         root.withdraw()
         root.attributes("-topmost", True)
 

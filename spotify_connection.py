@@ -3,6 +3,8 @@ from spotipy.oauth2 import SpotifyOAuth
 
 from settings_manager import load_settings
 
+from paths import get_spotify_cache_file
+
 
 class SpotifyConnection:
 
@@ -81,7 +83,10 @@ class SpotifyConnection:
                         "user-read-currently-playing "
                         "playlist-read-private "
                         "playlist-read-collaborative"
-                    )
+                    ),
+
+                    cache_path=str(get_spotify_cache_file()),
+                    open_browser=True
 
                 )
 

@@ -4,7 +4,7 @@
   <img src="docs/screenshots/abicut_logo.png" alt="AbiCut Logo" width="650">
 </p>
 
-**AbiCut** is a Python desktop application for preparing and controlling music segments together with PowerPoint slides during live school events.
+**AbiCut** is a Windows desktop application for preparing and controlling music segments together with PowerPoint slides during live school events.
 
 The project was developed for a real graduation-event workflow: each presentation slide can be assigned to a student and a specific Spotify track segment. AbiCut combines project preparation, Spotify integration, PowerPoint monitoring and a dedicated live view in one application.
 
@@ -39,6 +39,8 @@ Student names are imported from the selected Excel file. AbiCut detects the rele
 
 A Spotify playlist can be imported and matched to the generated student slides.
 
+Spotify is optional: AbiCut can be started and used without Spotify credentials. Spotify-dependent features become available after the credentials are configured in the application settings.
+
 ![AbiCut Playlist Import](docs/screenshots/playlist_import.png)
 
 ### 4. Manage Projects
@@ -71,7 +73,6 @@ During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the cur
 |---|---|---|
 | ![](docs/screenshots/live_unconfigured.png) | ![](docs/screenshots/live_playing.png) | ![](docs/screenshots/live_disabled.png) |
 
-
 ## Features
 
 - **Project Wizard**
@@ -86,7 +87,9 @@ During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the cur
   - keep track of project preparation progress
 
 - **Spotify Integration**
+  - optional Spotify configuration
   - Spotify OAuth authentication
+  - persistent local OAuth cache
   - playlist import
   - track metadata retrieval
   - playback control
@@ -104,6 +107,8 @@ During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the cur
 - **PowerPoint Integration**
   - reads the current PowerPoint slideshow position through Windows COM
   - detects slide changes during the presentation
+  - reconnects if PowerPoint is opened later
+  - handles unavailable or closed presentations without crashing
   - triggers the configured Spotify segment for the active slide
 
 - **Live Monitor**
@@ -112,11 +117,17 @@ During Live Mode, AbiCut reacts to PowerPoint slide changes and displays the cur
   - previews the next slide / student / song
   - displays playback progress and remaining time
   - distinguishes between active, disabled and unconfigured slides
+  - indicates PowerPoint connection / slideshow status
 
 - **JSON-based Project Storage**
   - project metadata and slide configuration are stored in readable JSON files
   - each student receives a unique ID
   - configuration states such as `enabled`, `song_added` and `time_confirmed` are stored explicitly
+
+- **Persistent User Data**
+  - projects and settings are stored separately from the application files
+  - project folders can be copied between PCs
+  - application updates do not require moving project data
 
 ## Architecture
 
@@ -131,12 +142,12 @@ Spotify playlist ────────┼──> Project Wizard
                          │        v
                          └──> AbiCut Editor
                                   │
-                       ┌──────────┴──────────┐
-                       │                     │
-                       v                     v
-                Spotify Web API       PowerPoint COM
-                       │                     │
-                       └──────────┬──────────┘
+                        ┌─────────┴─────────┐
+                        │                   │
+                        v                   v
+                Spotify Web API      PowerPoint COM
+                        │                   │
+                        └─────────┬─────────┘
                                   v
                            Live Controller
                                   │
@@ -148,13 +159,15 @@ The application is split into dedicated modules for project management, configur
 
 ## Example Project Data
 
-A simplified project configuration is included as:
+The repository contains:
 
 ```text
 config.example.json
 ```
 
-Each slide can contain data such as:
+This file documents the current AbiCut project format using fictional names and placeholder Spotify data. It is not automatically loaded as a real project.
+
+A slide entry can contain data such as:
 
 ```json
 {
@@ -173,7 +186,17 @@ Each slide can contain data such as:
 }
 ```
 
-This makes the project state transparent and reproducible without storing real student or event data in the public repository.
+Real AbiCut projects are created under:
+
+```text
+Documents/
+└── AbiCut/
+    └── projects/
+        └── <project-name>/
+            └── config.json
+```
+
+This keeps real student and event data outside the public repository.
 
 ## Tech Stack
 
@@ -186,20 +209,28 @@ This makes the project state transparent and reproducible without storing real s
 - **openpyxl / xlrd** — Excel file support
 - **JSON** — project and settings storage
 - **threading** — playback timing and fades
+- **PyInstaller** — Windows application build
+- **Inno Setup** — Windows installer packaging
 
 ## Requirements
 
 AbiCut currently targets **Windows**, because the PowerPoint integration uses `win32com`.
 
-You need:
+For the core application you need:
 
 - Python 3
 - Microsoft PowerPoint desktop application
-- a Spotify developer application / API credentials
-- an available Spotify playback device
 - the Python packages listed in `requirements.txt`
 
-## Installation
+Spotify is **not required to start AbiCut**.
+
+To use Spotify-dependent features such as playlist import, song testing and playback control, you additionally need:
+
+- a Spotify developer application
+- valid Spotify API credentials
+- an available Spotify playback device
+
+## Installation from Source
 
 Clone the repository:
 
@@ -214,65 +245,95 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
-## Spotify Configuration
-
-Real Spotify credentials are intentionally **not** stored in this repository.
-
-AbiCut requires valid Spotify API credentials **before the first application start**.
-
-Create a local settings file from the provided example:
-
-### PowerShell
-
-```powershell
-Copy-Item settings.example.json settings.json
-```
-
-Then open `settings.json` and enter your own Spotify application credentials:
-
-```json
-{
-  "spotify": {
-    "client_id": "YOUR_SPOTIFY_CLIENT_ID",
-    "client_secret": "YOUR_SPOTIFY_CLIENT_SECRET",
-    "redirect_uri": "http://127.0.0.1:8888/callback"
-  },
-  "defaults": {
-    "song_duration": 30000,
-    "fade_in": 2,
-    "fade_out": 2,
-    "start_ms": 0
-  }
-}
-```
-
-`settings.json` is excluded through `.gitignore` and should remain local.
-
-Important: Configure client_id and client_secret before running main.py.
-The Spotify connection is initialized during application startup.
-
-## Running AbiCut
-
-After installing the dependencies and configuring your Spotify credentials, start the application with:
+Start AbiCut:
 
 ```bash
 python main.py
 ```
 
-For Live Mode:
+On first launch, AbiCut creates its local data directory automatically:
 
-1. Open the prepared PowerPoint presentation.
-2. Start the PowerPoint slideshow.
+```text
+Documents/
+└── AbiCut/
+    ├── settings.json
+    ├── current_project.txt
+    └── projects/
+```
+
+The Spotify OAuth cache is created in the same directory after the first successful Spotify authentication:
+
+```text
+Documents\AbiCut\.spotify_cache
+```
+
+## Spotify Configuration
+
+Real Spotify credentials are intentionally **not** stored in this repository.
+
+AbiCut can be started normally without Spotify credentials. Spotify-dependent features remain unavailable until credentials are added.
+
+To enable Spotify integration, open the AbiCut settings and enter:
+
+- Spotify Client ID
+- Spotify Client Secret
+- Redirect URI
+
+The default redirect URI is:
+
+```text
+http://127.0.0.1:8888/callback
+```
+
+The Spotify application must use the same redirect URI.
+
+AbiCut stores the local settings in:
+
+```text
+Documents\AbiCut\settings.json
+```
+
+Spotify OAuth authentication is cached locally in:
+
+```text
+Documents\AbiCut\.spotify_cache
+```
+
+Both files are local runtime data and must not be committed to Git.
+
+## Running AbiCut
+
+Start the application with:
+
+```bash
+python main.py
+```
+
+AbiCut can be used for project management and preparation without Spotify credentials.
+
+For the full Live Mode workflow:
+
+1. Configure Spotify credentials in AbiCut.
+2. Authenticate Spotify once.
 3. Make sure a Spotify playback device is active.
-4. Open the prepared AbiCut project.
-5. Start Live Mode.
-6. Changing the PowerPoint slide triggers the corresponding configured Spotify segment.
+4. Open the prepared PowerPoint presentation.
+5. Start the PowerPoint slideshow.
+6. Open the prepared AbiCut project.
+7. Start Live Mode.
+8. Changing the PowerPoint slide triggers the corresponding configured Spotify segment.
+
+AbiCut can also reconnect to PowerPoint if the presentation is opened after the application.
 
 ## Project Structure
 
 ```text
 abicut/
+├── assets/
+│   ├── abicut_logo.png
+│   └── abicut_logo.ico
+│
 ├── main.py                  # Application entry point
+├── paths.py                 # Application, resource and user-data paths
 ├── startscreen.py           # Main menu / project overview
 ├── project_wizard.py        # New-project workflow
 ├── project_manager.py       # Project management
@@ -282,7 +343,7 @@ abicut/
 ├── playlist_importer.py     # Spotify playlist import
 ├── gui.py                   # Main project editor
 ├── slide_editor.py          # Detailed slide configuration
-├── spotify_connection.py    # Spotify connection handling
+├── spotify_connection.py    # Spotify connection / authentication
 ├── spotify_controller.py    # Spotify playback control
 ├── powerpoint_controller.py # PowerPoint COM integration
 ├── live_controller.py       # Live-event logic
@@ -292,8 +353,9 @@ abicut/
 ├── baseWindow.py            # Shared window behavior
 ├── utils.py                 # Time conversion utilities
 ├── requirements.txt
-├── settings.example.json
 ├── config.example.json
+├── version_info.txt
+├── AbiCut_Setup.iss
 └── .gitignore
 ```
 
@@ -303,24 +365,56 @@ The public repository intentionally excludes runtime and personal data such as:
 
 ```text
 settings.json
-config.json
-.cache
 current_project.txt
+.spotify_cache
+.cache
+config.json
 projects/
 __pycache__/
+build/
+dist/
+installer/
 ```
 
 This prevents Spotify credentials, authentication data and real student/project information from being published.
 
-The included `settings.example.json` and `config.example.json` files document the required structures using placeholder data.
+User data is stored separately from the application files under:
+
+```text
+Documents\AbiCut
+```
+
+This separation also allows AbiCut projects to be transferred between PCs by copying the corresponding project folder.
+
+## Windows Build
+
+AbiCut can be packaged as a Windows desktop application using PyInstaller.
+
+Example build command:
+
+```powershell
+python -m PyInstaller --noconfirm --clean --windowed --onedir --name "AbiCut" --icon "assets\abicut_logo.ico" --version-file "version_info.txt" --add-data "assets;assets" main.py
+```
+
+The generated application is located under:
+
+```text
+dist\AbiCut\
+```
+
+A Windows installer can then be created from the generated `dist\AbiCut` folder using the included `AbiCut_Setup.iss` Inno Setup script.
+
+> The public build must not include real student data or private project folders.
 
 ## Project Status
 
-**Completed / operational**
+**Version 1.0 — completed / operational**
 
-AbiCut was developed as a complete desktop application for a real school event workflow. The application combines preparation, validation and live control instead of focusing only on a single playback script.
+AbiCut was developed as a complete desktop application for a real school event workflow. The application combines project preparation, validation and live control instead of focusing only on a single playback script.
 
-The public repository is intended to document the technical implementation while keeping credentials and real project data private.
+The current version includes persistent user-data paths, optional Spotify configuration, local OAuth caching, PowerPoint reconnection handling, Windows application branding and installer support.
+
+The public repository documents the technical implementation while keeping credentials and real project data private.
 
 ## Background
 

@@ -11,6 +11,8 @@ import subprocess
 
 from baseWindow import BaseWindow
 
+from paths import get_projects_dir
+
 from project_controller import (
     get_current_project,
     set_current_project
@@ -37,6 +39,7 @@ class StartScreen(BaseWindow):
         
 
         self.root = tk.Tk()
+        self.set_app_icon()
 
 
         self.root.title("AbiCut")
@@ -224,7 +227,7 @@ class StartScreen(BaseWindow):
     def open_project(self):
 
         filename = filedialog.askopenfilename(
-            initialdir="projects",
+            initialdir=get_projects_dir(),
             title="Projekt öffnen",
             filetypes=[
                 ("AbiCut Projekt", "*.json")

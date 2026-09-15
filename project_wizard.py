@@ -9,6 +9,8 @@ from project_controller import set_current_project
 
 from baseWindow import BaseWindow
 
+from paths import get_app_icon
+
 import subprocess
 
 class ProjectWizard(BaseWindow):
@@ -18,6 +20,17 @@ class ProjectWizard(BaseWindow):
         super().__init__()
 
         self.root = tk.Tk()
+
+        self.set_app_icon()
+
+        try:
+            icon_path = get_app_icon()
+
+            if icon_path.exists():
+                self.root.iconbitmap(default=str(icon_path))
+
+        except Exception as e:
+            print("Project Wizard ICO Fehler:", e)
 
         self.root.title("AbiCut - Neues Projekt")
         self.root.geometry("620x420")

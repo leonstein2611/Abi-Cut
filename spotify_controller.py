@@ -9,6 +9,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from settings_manager import get_spotify
 
+from paths import get_spotify_cache_file
+
 
 class SpotifyController:
 
@@ -26,12 +28,22 @@ class SpotifyController:
         if client_id and client_secret and redirect_uri:
 
             try:
-                self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-                    client_id=client_id,
-                    client_secret=client_secret,
-                    redirect_uri=redirect_uri,
-                    scope="user-modify-playback-state user-read-playback-state"
-                ))
+                self.sp = spotipy.Spotify(
+                    auth_manager=SpotifyOAuth(
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        redirect_uri=redirect_uri,
+                        scope=(
+                            "user-read-playback-state "
+                            "user-modify-playback-state "
+                            "user-read-currently-playing "
+                            "playlist-read-private "
+                            "playlist-read-collaborative"
+                        ),
+                        cache_path=str(get_spotify_cache_file()),
+                        open_browser=True
+                    )
+                )
 
                 self.configured = True
 
@@ -43,29 +55,6 @@ class SpotifyController:
         self.last_play_time = 0
         self.fade_lock = threading.Lock()
         self.playback_session = 0
-
-    # =========================
-    # Device holen
-    # =========================
-
-    def get_device_id(self):
-
-        if self.sp is None:
-            return None
-
-        try:
-            devices = self.sp.devices()
-        except Exception:
-            return None
-
-        if not devices["devices"]:
-            return None
-
-        for device in devices["devices"]:
-            if device["is_active"]:
-                return device["id"]
-
-        return devices["devices"][0]["id"]
 
     # =========================
     # Lautstärke setzen
@@ -205,13 +194,26 @@ class SpotifyController:
 
         try:
             devices = self.sp.devices()
-        except Exception:
+
+        except Exception as e:
+            print("Spotify Device Fehler:", e)
             return None
 
-        for device in devices["devices"]:
+        for device in devices.get("devices", []):
 
-            if device["is_active"]:
-                return device["id"]
+            if device.get("is_active"):
+
+                # Spotify kann einzelne Player
+                # für Web-API-Steuerung sperren
+                if device.get("is_restricted", False):
+                    print(
+                        "Aktives Spotify Device ist "
+                        "für API-Steuerung eingeschränkt:",
+                        device.get("name", "Unbekannt")
+                    )
+                    return None
+
+                return device.get("id")
 
         return None
 
@@ -226,25 +228,25 @@ class SpotifyController:
 
         fade_duration = 2
 
-        wait_time = (duration_ms / 1000) - fade_duration
+        wait_time = (
+            duration_ms / 1000
+        ) - fade_duration
 
         if wait_time > 0:
             time.sleep(wait_time)
 
-        # Wurde inzwischen neuer Song gestartet?
         if session_id != self.playback_session:
             return
 
-        self.fade_out(100, fade_duration)
+        self.fade_out(
+            100,
+            fade_duration
+        )
 
-        # Erneut prüfen
         if session_id != self.playback_session:
             return
 
-        try:
-            self.sp.pause_playback()
-        except:
-            pass
+        self.stop()
 
     # =========================
     # Stop
@@ -253,22 +255,35 @@ class SpotifyController:
     def stop(self):
 
         if self.sp is None:
-            return
+            return False
 
         try:
 
             info = self.get_current_track_info()
 
-            if info:
-                self.sp.pause_playback()
+            if not info:
+                return False
+
+            if not info["is_playing"]:
+                return True
+
+            device_id = self.get_active_device()
+
+            if not device_id:
+                return False
+
+            self.sp.pause_playback(
+                device_id=device_id
+            )
+
+            return True
 
         except Exception as e:
 
-            if "403" in str(e):
-                return
+            print("Spotify Pause Fehler:", e)
 
-            print(e)
-
+            return False
+    
     # =========================
     # Aktuelle Position
     # =========================
@@ -316,3 +331,63 @@ class SpotifyController:
             }
 
         return None
+
+    # =========================
+    # Song-Infos aus URI laden
+    # =========================
+
+    def get_track_info_from_uri(self, uri):
+
+        if self.sp is None:
+            return None
+
+        try:
+
+            track = self.sp.track(uri)
+
+            return {
+                "song": track["name"],
+                "artist": track["artists"][0]["name"],
+                "duration_ms": track["duration_ms"]
+            }
+
+        except Exception as e:
+
+            print("Track Info Fehler:", e)
+
+            return None
+
+    # =========================
+    # Wiedergabeposition setzen
+    # =========================
+
+    def seek_to_position(self, position_ms):
+
+        if self.sp is None:
+            return False
+
+        try:
+
+            position_ms = max(
+                0,
+                int(position_ms)
+            )
+
+            device_id = self.get_active_device()
+
+            if not device_id:
+                print("Kein aktives Spotify Device")
+                return False
+
+            self.sp.seek_track(
+                position_ms,
+                device_id=device_id
+            )
+
+            return True
+
+        except Exception as e:
+
+            print("Spotify Seek Fehler:", e)
+
+            return False

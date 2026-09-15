@@ -1,7 +1,9 @@
 import json
 import os
 
-SETTINGS_FILE = "settings.json"
+from paths import get_settings_file
+
+SETTINGS_FILE = get_settings_file()
 
 
 DEFAULT_SETTINGS = {
